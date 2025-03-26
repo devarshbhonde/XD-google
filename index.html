@@ -67,7 +67,7 @@
         <input type="text" id="question" class="search-bar" placeholder="Ask a question...">
         <div class="buttons">
             <button class="btn" onclick="getAnswer()">Get Answer</button>
-            <button class="btn" onclick="document.getElementById('question').value = ''">Clear</button>
+            <button class="btn" onclick="document.getElementById('question').value = ''; document.getElementById('answer').innerHTML = ''">Clear</button>
         </div>
         <div id="answer"></div>
     </div>
@@ -84,7 +84,7 @@
 
             answerDiv.innerHTML = "Thinking...";
 
-            const apiKey = "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"; // Replace with your OpenAI API key
+            const apiKey = "your-openai-api-key-here"; // Replace with your OpenAI API key
             const url = "https://api.openai.com/v1/chat/completions";
 
             try {
@@ -102,14 +102,19 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error("API request failed");
+                    const errorText = await response.text();
+                    throw new Error(`API request failed with status ${response.status}: ${errorText}`);
                 }
 
                 const data = await response.json();
+                if (!data.choices || !data.choices[0]) {
+                    throw new Error("No response choices returned from API");
+                }
                 const answer = data.choices[0].message.content;
                 answerDiv.innerHTML = `<strong>Answer:</strong> ${answer}`;
             } catch (error) {
                 answerDiv.innerHTML = `Oops! Something went wrong: ${error.message}`;
+                console.error("Error details:", error);
             }
         }
     </script>
