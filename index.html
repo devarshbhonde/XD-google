@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask Me - Powered by OpenAI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fff;
+        }
+        .container {
+            text-align: center;
+        }
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: #4285f4;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            width: 500px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.1);
+            outline: none;
+        }
+        .search-bar:focus {
+            border-color: #4285f4;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            border: 1px solid #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .btn:hover {
+            border-color: #dadce0;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        #answer {
+            margin-top: 30px;
+            max-width: 600px;
+            text-align: left;
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Ask Me</div>
+        <input type="text" id="question" class="search-bar" placeholder="Ask a question...">
+        <div class="buttons">
+            <button class="btn" onclick="getAnswer()">Get Answer</button>
+            <button class="btn" onclick="document.getElementById('question').value = ''">Clear</button>
+        </div>
+        <div id="answer"></div>
+    </div>
+
+    <script>
+        async function getAnswer() {
+            const question = document.getElementById('question').value;
+            const answerDiv = document.getElementById('answer');
+
+            if (!question) {
+                answerDiv.innerHTML = "Please enter a question!";
+                return;
+            }
+
+            answerDiv.innerHTML = "Thinking...";
+
+            const apiKey = "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"; // Replace with your OpenAI API key
+            const url = "https://api.openai.com/v1/chat/completions";
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [{ role: "user", content: question }],
+                        max_tokens: 150
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("API request failed");
+                }
+
+                const data = await response.json();
+                const answer = data.choices[0].message.content;
+                answerDiv.innerHTML = `<strong>Answer:</strong> ${answer}`;
+            } catch (error) {
+                answerDiv.innerHTML = `Oops! Something went wrong: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
